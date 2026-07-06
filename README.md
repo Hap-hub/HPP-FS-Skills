@@ -125,14 +125,16 @@ Then use it in Claude Code:
 
 ## Obsidian Claudian Setup
 
-Claudian runs Claude Code from inside an Obsidian vault. For vault-specific use, install the skill into the vault's `.claude/skills` directory and create a vault-level command.
+Claudian runs Claude Code from inside an Obsidian vault. For vault-specific use, keep this package in a normal vault folder and create a vault-level command that reads it explicitly.
+
+Compatibility note: do not place this package directly under `.claude/skills` unless you have verified your Claudian version can auto-load it. Some Claudian builds scan `.claude/skills` during plugin startup; an incompatible skill package can prevent the plugin from loading. The safer pattern is to store it as `HPP-FS-Skills/` in the vault and reference it from `/hpp-fs`.
 
 Example for a vault at `E:\Obsidian\hyper`:
 
 ```powershell
 $vault = "E:\Obsidian\hyper"
-New-Item -ItemType Directory -Force -Path "$vault\.claude\skills", "$vault\.claude\commands" | Out-Null
-Copy-Item -Path ".\hpp-fs-skills" -Destination "$vault\.claude\skills\hpp-fs-skills" -Recurse -Force
+New-Item -ItemType Directory -Force -Path "$vault\.claude\commands" | Out-Null
+Copy-Item -Path ".\hpp-fs-skills" -Destination "$vault\HPP-FS-Skills" -Recurse -Force
 ```
 
 Create `$vault\.claude\commands\hpp-fs.md`:
@@ -143,11 +145,11 @@ description: Evaluate HPP notes and project files in this Obsidian vault with HP
 argument-hint: [note path, selected project, or assessment request]
 ---
 
-Use the HPP-FS-Skills skill available in this vault at:
+Use the HPP-FS-Skills reference package available in this vault at:
 
-`.claude\skills\hpp-fs-skills`
+`HPP-FS-Skills`
 
-Read the skill's `SKILL.md`, then load only the relevant reference files. When the request refers to an Obsidian note, inspect the note and nearby linked notes first. Prioritize vault/project data over default assumptions.
+Read `HPP-FS-Skills\SKILL.md`, then load only the relevant reference files. When the request refers to an Obsidian note, inspect the note and nearby linked notes first. Prioritize vault/project data over default assumptions.
 
 Always include both:
 
@@ -164,12 +166,12 @@ Create or update `$vault\CLAUDE.md` with a short project instruction:
 ```markdown
 # Claude Code / Claudian Project Instructions
 
-Use `.claude/skills/hpp-fs-skills` when the user asks about hydropower feasibility, bankability, Kazakhstan or Central Asia power markets, investor due diligence, or EPC bidding strategy.
+Use `HPP-FS-Skills` when the user asks about hydropower feasibility, bankability, Kazakhstan or Central Asia power markets, investor due diligence, or EPC bidding strategy.
 
 For substantive HPP assessments, follow the six-part HPP-FS-Skills structure and always include both investor/developer and EPC contractor perspectives unless the user explicitly asks for only one.
 ```
 
-If Claudian has a stale Claude Code path, update `.claudian\claudian-settings.json` so `providerConfigs.claude.cliPath` points to the current Claude Code executable. On Windows desktop installs, it is commonly under:
+If Claudian has a stale Claude Code path, update the Claude provider path in Claudian settings or create a small `claude.cmd` shim that forwards to the current Claude Code executable. On Windows desktop installs, the native executable is commonly under:
 
 ```text
 %APPDATA%\Claude\claude-code\<version>\claude.exe
