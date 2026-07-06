@@ -71,6 +71,116 @@ For best results, attach or paste any available project data:
 - EIA/ESIA screening
 - Draft capacity agreement, PPA, EPC contract, or auction documents
 
+## Claude Code Setup
+
+Install the skill into Claude Code's global skills directory:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills" | Out-Null
+Copy-Item -Path ".\hpp-fs-skills" -Destination "$env:USERPROFILE\.claude\skills\hpp-fs-skills" -Recurse -Force
+```
+
+Create a global slash command:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\commands" | Out-Null
+notepad "$env:USERPROFILE\.claude\commands\hpp-fs.md"
+```
+
+Use this command body:
+
+```markdown
+---
+description: Use HPP-FS-Skills for hydropower feasibility, bankability, investor, and EPC strategy work.
+argument-hint: [project files, project name, or assessment request]
+---
+
+Use the HPP-FS-Skills skill installed at:
+
+`$env:USERPROFILE\.claude\skills\hpp-fs-skills`
+
+First read `SKILL.md`, then the relevant files under `references/`.
+
+Assess the user's request using the required six-part structure:
+
+1. Project overview and technical feasibility
+2. Environmental, social, and permitting feasibility
+3. Economic and financial feasibility
+4. Legal, policy, institutional, and market feasibility
+5. Risk assessment and mitigation
+6. Dual-track participation strategy for investor/developer and EPC contractor
+
+Prioritize user-provided project data. Label all assumptions. Use `scripts/hpp_financial_model.py` when a runnable financial model or sensitivity analysis is requested.
+
+User request:
+
+$ARGUMENTS
+```
+
+Then use it in Claude Code:
+
+```text
+/hpp-fs evaluate this Kazakhstan HPP for investors and EPC bidders
+```
+
+## Obsidian Claudian Setup
+
+Claudian runs Claude Code from inside an Obsidian vault. For vault-specific use, install the skill into the vault's `.claude/skills` directory and create a vault-level command.
+
+Example for a vault at `E:\Obsidian\hyper`:
+
+```powershell
+$vault = "E:\Obsidian\hyper"
+New-Item -ItemType Directory -Force -Path "$vault\.claude\skills", "$vault\.claude\commands" | Out-Null
+Copy-Item -Path ".\hpp-fs-skills" -Destination "$vault\.claude\skills\hpp-fs-skills" -Recurse -Force
+```
+
+Create `$vault\.claude\commands\hpp-fs.md`:
+
+```markdown
+---
+description: Evaluate HPP notes and project files in this Obsidian vault with HPP-FS-Skills.
+argument-hint: [note path, selected project, or assessment request]
+---
+
+Use the HPP-FS-Skills skill available in this vault at:
+
+`.claude\skills\hpp-fs-skills`
+
+Read the skill's `SKILL.md`, then load only the relevant reference files. When the request refers to an Obsidian note, inspect the note and nearby linked notes first. Prioritize vault/project data over default assumptions.
+
+Always include both:
+
+- Investor/developer bankability and due diligence strategy
+- EPC contractor tender, risk, construction, interface, and claims strategy
+
+User request:
+
+$ARGUMENTS
+```
+
+Create or update `$vault\CLAUDE.md` with a short project instruction:
+
+```markdown
+# Claude Code / Claudian Project Instructions
+
+Use `.claude/skills/hpp-fs-skills` when the user asks about hydropower feasibility, bankability, Kazakhstan or Central Asia power markets, investor due diligence, or EPC bidding strategy.
+
+For substantive HPP assessments, follow the six-part HPP-FS-Skills structure and always include both investor/developer and EPC contractor perspectives unless the user explicitly asks for only one.
+```
+
+If Claudian has a stale Claude Code path, update `.claudian\claudian-settings.json` so `providerConfigs.claude.cliPath` points to the current Claude Code executable. On Windows desktop installs, it is commonly under:
+
+```text
+%APPDATA%\Claude\claude-code\<version>\claude.exe
+```
+
+In Obsidian, open the Claudian sidebar and run:
+
+```text
+/hpp-fs assess the current HPP note for bankability and EPC bid strategy
+```
+
 ## Financial Model
 
 Run the included financial model with project-specific assumptions:
