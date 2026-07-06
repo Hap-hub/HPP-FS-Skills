@@ -1,0 +1,7 @@
+interface:
+  display_name: "HPP FS Skills"
+  short_description: "Bankable hydropower FS for Kazakhstan."
+  default_prompt: "Use $hpp-fs-skills to evaluate a Kazakhstan hydropower project for investors and EPC bidders."
+
+policy:
+  allow_implicit_invocation: true
